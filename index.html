@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>يلا كورة | القنوات والمباريات</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            direction: rtl;
+            overflow-x: hidden;
+        }
+        .header {
+            background: #fff;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #4CAF50;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 10px auto;
+            padding: 10px;
+        }
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 10px;
+        }
+        .category {
+            background: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid #ccc;
+        }
+        .category:hover {
+            transform: scale(1.05);
+        }
+        .category img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+        }
+        .category span {
+            display: block;
+            padding: 8px;
+            text-align: center;
+            font-size: 1em;
+            color: #000;
+        }
+        .channels-section {
+            display: none;
+            padding: 10px;
+        }
+        .channels-section.active {
+            display: block;
+        }
+        .back-btn {
+            background: #fff;
+            color: #000;
+            padding: 8px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .back-btn:hover {
+            background: #e0e0e0;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #fff;
+            color: #000;
+            font-size: 1em;
+        }
+        .channels-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .channel {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .channel img {
+            width: 50px;
+            height: 50px;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+        .channel span {
+            flex-grow: 1;
+            font-size: 1.1em;
+        }
+        .watch-btn {
+            background: #007bff;
+            color: #fff;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .watch-btn:hover {
+            background: #0056b3;
+        }
+        .player-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 1000;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        #player {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            object-fit: fill !important;
+            object-position: center;
+            display: block !important;
+            z-index: 1001;
+            position: relative;
+            background: #000;
+            margin: 0 auto !important;
+        }
+        .plyr__controls {
+            z-index: 1002 !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+            margin: 0 auto;
+            padding: 5px;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.7);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .server-selection {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            flex-wrap: nowrap;
+            gap: 5px;
+            background: #fff;
+            padding: 5px;
+            border-radius: 3px;
+            overflow-x: auto;
+            white-space: nowrap;
+            max-width: 90vw;
+            z-index: 1003;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .server-selection.visible {
+            display: flex;
+            opacity: 1;
+            visibility: visible;
+        }
+        .server-btn {
+            background: #ffffff;
+            color: #000;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .server-btn.active {
+            background: #00bcd4;
+            color: #fff;
+        }
+        .server-btn:hover {
+            background: #b0bec5;
+        }
+        .server-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .server-selection::-webkit-scrollbar {
+            display: none;
+        }
+        .server-selection {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .player-back-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #fff;
+            color: #000;
+            padding: 8px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1003;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+        .player-back-btn:hover {
+            background: #e0e0e0;
+        }
+        .loading-spinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 5px solid #444;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            z-index: 1003;
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        #m3u8OnlineFrame {
+            display: none;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #000;
+            z-index: 1001;
+        }
+        .video-error {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff4444;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ff4444;
+            border-radius: 5px;
+            z-index: 1003;
+            text-align: center;
+            max-width: 90vw;
+        }
+        @media (orientation: landscape) {
+            .player-container {
+                width: 100vw;
+                height: 100vh;
+            }
+            #player {
+                width: 100% !important;
+                height: 100% !important;
+                max-width: 100vw !important;
+                max-height: 100vh !important;
+                object-fit: fill !important;
+                object-position: center;
+                margin: 0 auto !important;
+            }
+            .plyr__controls {
+                width: 100% !important;
+                max-width: 100vw !important;
+                margin: 0 auto;
+            }
+            .server-selection {
+                max-width: 90vw;
+                transform: translateX(-50%);
+            }
+        }
+        @media (orientation: portrait) {
+            .player-container {
+                width: 100vw;
+                height: 100vh;
+            }
+            #player {
+                width: 100% !important;
+                height: 100% !important;
+                max-width: 100vw !important;
+                max-height: 100vh !important;
+                object-fit: fill !important;
+                object-position: center;
+                margin: 0 auto !important;
+            }
+            .plyr__controls {
+                width: 100% !important;
+                max-width: 100vw !important;
+                margin: 0 auto;
+            }
+            .server-selection {
+                max-width: 90vw;
+                transform: translateX(-50%);
+            }
+        }
+        .player-container:-webkit-full-screen #player,
+        .player-container:fullscreen #player {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            object-fit: fill !important;
+            object-position: center;
+            margin: 0 auto !important;
+        }
+        .player-container:-webkit-full-screen,
+        .player-container:fullscreen {
+            width: 100vw !important;
+            height: 100vh !important;
+            background: #000;
+        }
+
+        :root {
+            --app-bg: #0b1220;
+            --panel-bg: #121d30;
+            --card-bg: #17243a;
+            --accent: #16c784;
+            --accent2: #0ea5e9;
+            --text-main: #f1f5f9;
+            --text-muted: #a8b6ca;
+            --border: #293950;
+        }
+        body { background: var(--app-bg); color: var(--text-main); }
+        .header {
+            background: linear-gradient(135deg, #101a2b, #172b43);
+            color: var(--text-main); position: sticky; top: 0; z-index: 50;
+            display: flex; align-items: center; justify-content: center; min-height: 52px;
+            border-bottom: 1px solid var(--border);
+        }
+        h1 { color: var(--accent); font-size: 1.45em; }
+        .menu-toggle {
+            position: absolute; right: 12px; top: 12px; border: 1px solid #34465f;
+            background: #1b2b42; color: #fff; border-radius: 10px; padding: 7px 11px;
+            font-size: 20px; cursor: pointer;
+        }
+        .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1998; }
+        .drawer-overlay.open { display:block; }
+        .side-drawer {
+            position:fixed; z-index:1999; top:0; right:0; width:min(82vw,320px); height:100dvh;
+            background:#101b2d; border-left:1px solid var(--border); transform:translateX(105%);
+            transition:transform .25s ease; padding:18px 14px; box-sizing:border-box; overflow-y:auto;
+        }
+        .side-drawer.open { transform:translateX(0); }
+        .drawer-brand { padding:18px 12px; margin-bottom:12px; border-radius:14px;
+            background:linear-gradient(135deg,#15334a,#163d37); text-align:center; }
+        .drawer-brand strong { display:block; color:var(--accent); font-size:20px; margin-bottom:5px; }
+        .drawer-brand small { color:var(--text-muted); }
+        .drawer-item { width:100%; display:flex; gap:10px; align-items:center; text-align:right;
+            background:transparent; border:0; color:#e7eef8; padding:13px 12px; border-radius:10px;
+            margin:3px 0; font-size:15px; cursor:pointer; }
+        .drawer-item.active, .drawer-item:hover { background:#20334d; color:#45e0aa; }
+        .drawer-separator { border:0; border-top:1px solid var(--border); margin:12px 0; }
+        .container { max-width:1100px; margin:10px auto; padding:10px; }
+        .page-section { display:none; }
+        .page-section.active { display:block; }
+        .section-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 4px 14px; }
+        .section-heading h2 { margin:0; font-size:1.25em; color:#f8fafc; }
+        .section-subtitle { color:var(--text-muted); font-size:12px; margin-top:5px; }
+        .categories-grid { grid-template-columns:repeat(auto-fill,minmax(135px,1fr)); gap:12px; }
+        .category { background:var(--card-bg); border-color:var(--border); box-shadow:0 5px 15px rgba(0,0,0,.12); }
+        .category span { color:#f1f5f9; }
+        .channels-section { background:transparent; color:var(--text-main); }
+        .back-btn { background:#1c2c43; color:#fff; border-color:#34465f; }
+        .back-btn:hover { background:#263b57; }
+        .search-box { box-sizing:border-box; background:#111d30; color:#fff; border-color:#34465f; }
+        .search-box::placeholder { color:#8ea0b9; }
+        .channel { background:var(--card-bg); border-color:var(--border); color:#f1f5f9; box-shadow:0 3px 10px rgba(0,0,0,.1); }
+        .channel span { color:#f1f5f9; }
+        .watch-btn { background:var(--accent); color:#052e22; font-weight:bold; }
+        .watch-btn:hover { background:#10a96f; }
+        .matches-toolbar { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+        .match-filter { border:1px solid #34465f; background:#142239; color:#dbe7f5; padding:8px 13px; border-radius:9px; cursor:pointer; }
+        .match-filter.active { background:var(--accent); color:#052e22; border-color:var(--accent); font-weight:bold; }
+        .matches-status { color:var(--text-muted); font-size:13px; margin:8px 2px 12px; }
+        .matches-list { display:flex; flex-direction:column; gap:12px; }
+        .match-card { box-sizing:border-box; width:100%; min-width:0; overflow:hidden;
+            background:linear-gradient(145deg,#17263d,#101b2d); border:1px solid var(--border);
+            border-radius:15px; padding:14px; cursor:pointer; transition:border-color .15s,transform .15s; }
+        .match-card:hover,.match-card:focus-visible { border-color:var(--accent); transform:translateY(-1px); outline:none; }
+        .match-card-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+        .match-league { color:#4adeb0; font-size:12px; font-weight:700; line-height:1.5; min-width:0; overflow-wrap:anywhere; }
+        .match-state { flex:0 0 auto; color:#fbbf24; background:rgba(251,191,36,.10); border:1px solid rgba(251,191,36,.22); border-radius:999px; padding:4px 8px; font-size:11px; white-space:nowrap; }
+        .match-state.live { color:#fb7185; background:rgba(251,113,133,.10); border-color:rgba(251,113,133,.28); }
+        .match-teams { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:10px; text-align:center; direction:rtl; }
+        .match-team { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; min-width:0; font-weight:700; line-height:1.35; overflow-wrap:anywhere; }
+        .team-logo { display:block; width:42px; height:42px; object-fit:contain; flex:0 0 auto; }
+        span.team-logo { display:flex; align-items:center; justify-content:center; font-size:29px; }
+        .match-team-name { display:block; width:100%; font-size:13px; line-height:1.45; overflow-wrap:anywhere; }
+        .match-score { display:flex; align-items:center; justify-content:center; background:#0a1424; border:1px solid #2b3e59; border-radius:10px; padding:8px 9px; min-width:48px; max-width:84px; font-weight:800; font-size:15px; white-space:nowrap; }
+        .match-meta { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:14px; color:var(--text-muted); font-size:12px; }
+        .match-meta-item { min-width:0; padding:7px 8px; background:rgba(5,15,29,.42); border:1px solid rgba(116,145,180,.12); border-radius:8px; line-height:1.45; overflow-wrap:anywhere; }
+        .match-meta-item b { font-weight:600; color:#dbe7f5; }
+        .match-card .match-hint { display:block; margin-top:11px; color:#4adeb0; font-size:11px; text-align:center; }
+        .match-watch { background:#0ea5e9; color:white; border:0; border-radius:8px; padding:7px 12px; cursor:pointer; }
+        @media(max-width:360px) {
+            .match-card { padding:10px; }
+            .match-teams { gap:6px; }
+            .team-logo { width:34px; height:34px; }
+            .match-team-name { font-size:12px; }
+            .match-score { min-width:40px; padding:7px 5px; font-size:13px; }
+            .match-meta-item { padding:6px; font-size:11px; }
+        }
+        .empty-matches { text-align:center; color:var(--text-muted); padding:25px 12px; background:#111d30; border-radius:12px; }
+        /* Hide bottom navigation while a match/channel player is open */
+        body.player-open .bottom-nav { display: none !important; }
+        body.player-open { padding-bottom: 0 !important; }
+
+        /* Premium fixed bottom navigation for mobile */
+        body { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+        .bottom-nav {
+            position:fixed; z-index:1500; left:12px; right:12px; bottom:calc(10px + env(safe-area-inset-bottom));
+            display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:5px;
+            padding:7px; border:1px solid rgba(116,145,180,.25); border-radius:20px;
+            background:rgba(13,25,43,.94); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+            box-shadow:0 10px 32px rgba(0,0,0,.38);
+        }
+        .bottom-nav button {
+            min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+            border:1px solid transparent; border-radius:14px; padding:8px 3px 7px; color:#91a4bd;
+            background:transparent; font-size:11px; line-height:1.2; cursor:pointer; transition:all .18s ease;
+        }
+        .bottom-nav .nav-icon { font-size:20px; line-height:1; filter:saturate(.8); }
+        .bottom-nav button.active { color:#64efbd; background:linear-gradient(180deg,rgba(22,199,132,.18),rgba(22,199,132,.07)); border-color:rgba(22,199,132,.3); box-shadow:inset 0 0 0 1px rgba(22,199,132,.04); }
+        .bottom-nav button.active .nav-icon { transform:translateY(-1px); }
+        .bottom-nav button:active { transform:scale(.96); }
+        @media(min-width:700px) {
+            .bottom-nav { left:50%; right:auto; width:min(520px,calc(100% - 32px)); transform:translateX(-50%); }
+        }
+        @media(max-width:360px) { .bottom-nav button { font-size:10px; } .bottom-nav .nav-icon { font-size:18px; } }
+        @media(max-width:480px) {
+            .container { padding:7px; }
+            .categories-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .channel { padding:8px; }
+            .channel img { width:42px; height:42px; }
+            .channel span { font-size:14px; }
+            .watch-btn { padding:8px 10px; }
+        }
+
+
+        /* Adsterra in-app overlay with a permanent close control */
+        #adsterraOverlay{position:fixed;inset:0;z-index:2147483000;background:#fff;display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}
+        #adsterraOverlay.is-open{display:flex}
+        #adsterraTopbar{height:54px;min-height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:#111827;color:#fff;border-bottom:1px solid #334155;box-sizing:border-box}
+        #adsterraClose{border:0;border-radius:999px;width:42px;height:42px;background:#ef4444;color:#fff;font-size:28px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700}
+        #adsterraFrame{border:0;width:100%;height:calc(100% - 54px);flex:1;background:#fff;color:#111}
+        #adsterraFallback{display:none;position:absolute;inset:54px 0 0;background:#fff;color:#222;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box;z-index:2}
+        #adsterraFallback.show{display:flex}
+
+    
+        .notification-card { max-width: 720px; margin: 18px auto; padding: 20px; }
+        .notification-enable-btn { border: 0; border-radius: 10px; padding: 12px 18px; background: #16803c; color: #fff; font-size: 16px; cursor: pointer; margin: 8px 0; }
+        .notification-enable-btn:disabled { opacity: .6; cursor: wait; }
+        #notificationStatus { line-height: 1.7; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="menu-toggle" id="menuToggle" aria-label="فتح القائمة">☰</button>
+        <h1>يلا كورة</h1>
+    </div>
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <aside class="side-drawer" id="sideDrawer" aria-label="القائمة الجانبية">
+        <div class="drawer-brand"><strong>⚽ يلا كورة</strong><small>المباريات والقنوات الناقلة</small></div>
+        <button class="drawer-item" data-page="channelsPage">📺 القنوات الناقلة</button>
+        <button class="drawer-item active" data-page="matchesPage">⚽ مباريات اليوم</button>
+        <hr class="drawer-separator">
+        <button class="drawer-item" data-page="favoritesPage">⭐ المفضلة</button>
+        <button class="drawer-item" data-page="notificationsPage">🔔 التنبيهات</button>
+        <button class="drawer-item" data-page="settingsPage">⚙️ الإعدادات</button>
+        <button class="drawer-item" data-page="aboutPage">ℹ️ حول التطبيق</button>
+    </aside>
+    <div class="container">
+        <section class="page-section" id="channelsPage">
+            <div class="section-heading"><div><h2>القنوات الناقلة</h2><div class="section-subtitle">اختر القسم ثم القناة لمشاهدة البث</div></div></div>
+            <div class="categories-grid" id="categoriesGrid"></div>
+            <div class="channels-section" id="channelsSection">
+                <button class="back-btn" onclick="showCategories()">رجوع للأقسام</button>
+                <h2 id="categoryTitle"></h2>
+                <input type="text" class="search-box" id="searchBox" placeholder="ابحث عن قناة...">
+                <div class="channels-list" id="channelsList"></div>
+            </div>
+        </section>
+        <section class="page-section active" id="matchesPage">
+            <div class="section-heading"><div><h2>مباريات اليوم</h2><div class="section-subtitle">جدول المباريات حسب توقيت جهازك</div></div></div>
+            <div class="matches-toolbar">
+                <button class="match-filter active" data-filter="all">الكل</button>
+                <button class="match-filter" data-filter="live">مباشر الآن</button>
+                <button class="match-filter" data-filter="upcoming">لم تبدأ</button>
+                <button class="match-filter" data-filter="ended">انتهت</button>
+            </div>
+            <div class="matches-status" id="matchesStatus">يتم تجهيز جدول المباريات...</div>
+            <div class="matches-list" id="matchesList"></div>
+        </section>
+        <section class="page-section" id="favoritesPage"><div class="empty-matches">⭐ ستظهر هنا القنوات والمباريات التي تضيفها إلى المفضلة بعد تفعيلها.</div></section>
+        <section class="page-section" id="notificationsPage">
+            <div class="empty-matches notification-card">
+                <h3>🔔 إشعارات المباريات</h3>
+                <p>فعّل الإشعارات لاستلام رسائل يلا كورة من Firebase Cloud Messaging.</p>
+                <button id="enableNotificationsBtn" type="button" class="notification-enable-btn">تفعيل الإشعارات</button>
+                <p id="notificationStatus" role="status" aria-live="polite">الإشعارات غير مفعّلة بعد.</p>
+                <div id="notificationTokenWrap" hidden>
+                    <p><strong>رمز جهاز الإشعارات (FCM Token):</strong></p>
+                    <textarea id="notificationToken" readonly rows="4" style="width:100%;box-sizing:border-box;direction:ltr;word-break:break-all"></textarea>
+                    <button id="copyNotificationTokenBtn" type="button" class="notification-enable-btn">نسخ رمز الجهاز</button>
+                    <p style="font-size:13px">احتفظ بالرمز بشكل خاص. هذا الملف يهيّئ استقبال الإشعارات، لكن الإرسال التلقائي قبل المباريات يحتاج خدمة إرسال آمنة.</p>
+                </div>
+            </div>
+        </section>
+        <section class="page-section" id="settingsPage"><div class="empty-matches">⚙️ الإعدادات: يمكنك تخصيص المظهر والتنبيهات في تحديث لاحق.</div></section>
+        <section class="page-section" id="aboutPage"><div class="empty-matches">يلا كورة — واجهة لمتابعة القنوات وجدول المباريات.</div></section>
+    </div>
+    <nav class="bottom-nav" aria-label="التنقل الرئيسي">
+        <button data-page="channelsPage" aria-label="القنوات"><span class="nav-icon">📺</span><span>القنوات</span></button>
+        <button class="active" data-page="matchesPage" aria-label="مباريات اليوم"><span class="nav-icon">⚽</span><span>المباريات</span></button>
+        <button data-page="favoritesPage" aria-label="المفضلة"><span class="nav-icon">⭐</span><span>المفضلة</span></button>
+        <button data-page="settingsPage" aria-label="الإعدادات"><span class="nav-icon">⚙️</span><span>الإعدادات</span></button>
+    </nav>
+
+    <div class="player-container" id="playerContainer">
+        <button class="player-back-btn" id="playerBackBtn">رجوع</button>
+        <div class="server-selection" id="serverSelection"></div>
+        <div class="loading-spinner" id="loadingSpinner"></div>
+        <p class="video-error" id="videoError"></p>
+        <video id="player" controls playsinline preload="auto"></video>
+        <iframe id="m3u8OnlineFrame" title="M3U8Online Player" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dash.js@4.7.0/dist/dash.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.3.5/dist/shaka-player.compiled.min.js"></script>
+    <script>
+
+        // App navigation: move between channels and matches without reloading.
+        function closeDrawer() {
+            document.getElementById('sideDrawer')?.classList.remove('open');
+            document.getElementById('drawerOverlay')?.classList.remove('open');
+        }
+        function showPage(pageId) {
+            if (pageId !== 'playerContainer') document.body.classList.remove('player-open');
+            document.querySelectorAll('.page-section').forEach(el => el.classList.toggle('active', el.id === pageId));
+            document.querySelectorAll('[data-page]').forEach(el => el.classList.toggle('active', el.dataset.page === pageId));
+            closeDrawer();
+            if (pageId === 'matchesPage') loadTodayMatches();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+        document.getElementById('menuToggle')?.addEventListener('click', () => {
+            document.getElementById('sideDrawer')?.classList.add('open');
+            document.getElementById('drawerOverlay')?.classList.add('open');
+        });
+        document.getElementById('drawerOverlay')?.addEventListener('click', closeDrawer);
+        document.querySelectorAll('[data-page]').forEach(el => el.addEventListener('click', () => showPage(el.dataset.page)));
+
+        // Sat Zone is tried first for the requested preview. If its public JSON endpoint is not exposed/accessible,
+        // keep the existing Tifo source as a safe fallback so the schedule does not disappear.
+        const GITHUB_MATCHES_URL = 'https://raw.githubusercontent.com/pesmobilebysmwbayl8-netizen/yalla-kora-iraq/main/matches.json';
+        const SATZONE_BASE = 'https://satzone.net';
+        const SATZONE_API_CANDIDATES = [
+            date => `${SATZONE_BASE}/api/matches?date=${date}`,
+            date => `${SATZONE_BASE}/api/matches/today?date=${date}`,
+            date => `${SATZONE_BASE}/api/fixtures?date=${date}`,
+            date => `${SATZONE_BASE}/api/v1/matches?date=${date}`,
+            date => `${SATZONE_BASE}/api/v1/schedule?date=${date}`
+        ];
+        const TIFO_BASE = 'https://tifo.elyoxe.com/v1';
+        let cachedTodayMatches = [];
+        let currentMatchFilter = 'all';
+        let tifoLastLoad = 0;
+        let tifoLoading = false;
+        let currentMatchSource = 'Sat Zone (محاولة الاتصال)';
+        const tifoChannelCache = { list: null, loadedAt: 0 };
+        document.querySelectorAll('.match-filter').forEach(btn => btn.addEventListener('click', () => {
+            currentMatchFilter = btn.dataset.filter;
+            document.querySelectorAll('.match-filter').forEach(b => b.classList.toggle('active', b === btn));
+            renderTodayMatches();
+        }));
+        function escapeMatchText(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+        function objName(v) {
+            if (v == null) return '';
+            if (typeof v === 'string' || typeof v === 'number') return String(v);
+            return String(v.name || v.title || v.shortName || v.displayName || v.arabic_name || v.arabicName || '');
+        }
+        function pickValue(...values) {
+            for (const v of values) {
+                if (v !== undefined && v !== null && v !== '') return v;
+            }
+            return '';
+        }
+        const ARABIC_TEAM_NAMES = {
+            'real madrid':'ريال مدريد','real madrid cf':'ريال مدريد','barcelona':'برشلونة','fc barcelona':'برشلونة','atletico madrid':'أتلتيكو مدريد',
+            'manchester city':'مانشستر سيتي','man city':'مانشستر سيتي','manchester united':'مانشستر يونايتد','man utd':'مانشستر يونايتد',
+            'liverpool':'ليفربول','arsenal':'أرسنال','chelsea':'تشيلسي','tottenham':'توتنهام','tottenham hotspur':'توتنهام',
+            'bayern munich':'بايرن ميونخ','bayern münchen':'بايرن ميونخ','borussia dortmund':'بوروسيا دورتموند','paris saint-germain':'باريس سان جيرمان','psg':'باريس سان جيرمان',
+            'inter':'إنتر ميلان','inter milan':'إنتر ميلان','ac milan':'ميلان','juventus':'يوفنتوس','napoli':'نابولي','roma':'روما',
+            'arsenal fc':'أرسنال','newcastle united':'نيوكاسل يونايتد','aston villa':'أستون فيلا','bayer leverkusen':'باير ليفركوزن',
+            'ajax':'أياكس','benfica':'بنفيكا','porto':'بورتو','sporting cp':'سبورتينغ لشبونة','al hilal':'الهلال','al-hilal':'الهلال',
+            'al nassr':'النصر','al-nassr':'النصر','al ittihad':'الاتحاد','al-ahli':'الأهلي','al ahli':'الأهلي','al ain':'العين',
+            'iraq':'العراق','iraq national football team':'منتخب العراق','argentina':'الأرجنتين','brazil':'البرازيل','france':'فرنسا','england':'إنجلترا',
+            'spain':'إسبانيا','portugal':'البرتغال','germany':'ألمانيا','italy':'إيطاليا','netherlands':'هولندا','morocco':'المغرب','egypt':'مصر','saudi arabia':'السعودية'
+        };
+        function teamInfo(value) {
+            const raw = (value && typeof value === 'object') ? value : {};
+            const original = objName(value);
+            const key = original.trim().toLowerCase();
+            const name = ARABIC_TEAM_NAMES[key] || raw.name_ar || raw.arabic_name || raw.arabicName || original;
+            const logo = pickValue(raw.logo, raw.crest, raw.badge, raw.image, raw.image_url, raw.logo_url, raw.strBadge, raw.teamLogo, raw.team_logo, '');
+            return { name: String(name || ''), logo: typeof logo === 'string' ? logo : '' };
+        }
+        function parseMatchDate(value) {
+            if (value === undefined || value === null || value === '') return null;
+            if (typeof value === 'number' || /^\d{10,13}$/.test(String(value))) {
+                let n = Number(value);
+                if (n < 100000000000) n *= 1000; // Timestamps may be in seconds.
+                const d = new Date(n);
+                return Number.isNaN(d.getTime()) ? null : d;
+            }
+            const d = new Date(value);
+            return Number.isNaN(d.getTime()) ? null : d;
+        }
+        function normalizeTifoMatch(m) {
+            const homeInfo = teamInfo(pickValue(m.home, m.homeTeam, m.home_team, m.team_home, m.teams?.home, m.participants?.[0], m.homeParticipant));
+            const awayInfo = teamInfo(pickValue(m.away, m.awayTeam, m.away_team, m.team_away, m.teams?.away, m.participants?.[1], m.awayParticipant));
+            const home = homeInfo.name;
+            const away = awayInfo.name;
+            const competition = objName(pickValue(m.league, m.competition, m.tournament, m.competitionName, m.competition_name, m.league_name));
+            const kickoff = pickValue(m.kickoff, m.start_time, m.startTime, m.utcDate, m.utc_date, m.startDate, m.start_date, m.scheduled_at, m.timestamp, m.date, m.time, m.startAt, m.start_at);
+            const parsedKickoff = parseMatchDate(kickoff);
+            let time = '';
+            if (parsedKickoff) {
+                time = parsedKickoff.toLocaleTimeString('ar-IQ', {timeZone:'Asia/Baghdad', hour:'2-digit', minute:'2-digit', hour12:true});
+            } else if (kickoff) {
+                // Some feeds provide only a local clock value such as "19:30".
+                const clockText = String(kickoff).trim();
+                const clock = clockText.match(/(?:T|\s)?(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM|ص|م)?/i);
+                if (clock) {
+                    const marker = String(clock[3] || '').toUpperCase();
+                    const hour24 = marker === 'PM' ? (Number(clock[1]) % 12) + 12 : marker === 'AM' ? Number(clock[1]) % 12 : Number(clock[1]);
+                    time = `${String(hour24 % 12 || 12).padStart(2,'0')}:${clock[2]} ${marker === 'AM' || marker === 'ص' ? 'ص' : marker === 'PM' || marker === 'م' ? 'م' : (hour24 >= 12 ? 'م' : 'ص')}`;
+                } else time = clockText;
+            }
+            const statusValue = pickValue(m.status?.type?.state, m.status?.type?.name, m.status?.description, m.status?.name, m.status, m.state, m.matchStatus, m.statusText, '');
+            const statusRaw = String(objName(statusValue) || statusValue).toLowerCase();
+            const isEnded = /ended|finished|full.?time|complete|(^|\W)ft($|\W)|انتهت/.test(statusRaw);
+            const isLive = /live|in.?play|playing|1st|2nd|half.?time|مباشر/.test(statusRaw) || m.isLive === true || m.is_live === true;
+            let status = isLive ? 'live' : isEnded ? 'ended' : 'upcoming';
+            const homeScore = pickValue(m.homeScore, m.home_score, m.score?.home, m.scores?.home, m.home?.score, m.goals?.home);
+            const awayScore = pickValue(m.awayScore, m.away_score, m.score?.away, m.scores?.away, m.away?.score, m.goals?.away);
+            const scoreObj = (typeof m.score === 'object' && m.score) ? m.score : null;
+            let score = scoreObj ? pickValue(scoreObj.display, scoreObj.fullTime, scoreObj.full_time, scoreObj.current, '') : '';
+            if (!score && homeScore !== '' && awayScore !== '') score = `${homeScore} - ${awayScore}`;
+            if (!score) score = status === 'upcoming' ? 'VS' : '—';
+            const broadcast = pickValue(m.broadcast_info, m.broadcastInfo, m.broadcast, m.tv, m.channel_info, m.channelInfo, m.broadcasts, {});
+            const channel = objName(pickValue(m.channel, m.channel_name, m.channelName, m.broadcast_channel, m.broadcastChannel, m.tvChannel, m.tv_channel, m.broadcaster, broadcast?.channel, broadcast?.name, broadcast?.channel_name, broadcast?.[0]?.channel, broadcast?.[0]?.channel_name));
+            const commentary = pickValue(m.commentary_info, m.commentaryInfo, m.commentator_info, m.commentatorInfo, m.commentary, m.announcer, {});
+            const commentator = objName(pickValue(m.commentator, m.commentator_name, m.commentatorName, m.commentator_ar, m.commentator_name_ar, m.commentary_name, m.voice, m.speaker, commentary?.commentator, commentary?.commentator_name, commentary?.name, commentary?.voice, commentary?.person, commentary?.[0]?.name));
+            const directStream = pickValue(m.streamUrl, m.stream_url, m.stream, m.url, broadcast?.stream_url, broadcast?.url, broadcast?.[0]?.stream_url);
+            const id = pickValue(m.id, m.matchId, m.match_id, m.fixtureId, m.fixture_id, m.event_id, m.eventId, m.uid, `${home}-${away}-${kickoff}`);
+            return { raw:m, id:String(id), home, away, homeLogo:homeInfo.logo, awayLogo:awayInfo.logo, league:competition || 'كرة القدم', kickoff, parsedKickoff, time, status, score:String(score), channel, commentator, streamUrl:typeof directStream === 'string' ? directStream : '' };
+        }
+        function tifoUaeDateKey() {
+            // The device is expected to use Iraq local time (UTC+3); add one hour for UAE's day.
+            const d = new Date(Date.now() + 60 * 60 * 1000);
+            return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        }
+        // Optional match-specific channel/commentator data from the existing Supabase tables.
+        // Fixtures remain sourced automatically; Supabase only enriches their broadcast details.
+        const MATCH_OVERRIDES_CONFIG = {
+            url: 'https://fgpstmlacepcpwueobab.supabase.co',
+            publishableKey: 'sb_publishable_vI7XbcpRrferhAy_IbjK9A_Zxk-l9yO'
+        };
+        let cachedMatchOverrides = [];
+        let matchOverridesLoadedAt = 0;
+        let matchOverridesLoading = null;
+        function normalizeMatchKeyPart(value) {
+            return String(value ?? '').toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[ً-ٟ\u0640]/g, '').replace(/[^a-z0-9\u0600-\u06ff]/g, '');
+        }
+        function firstMatchField(row, names) {
+            for (const name of names) {
+                const value = row?.[name];
+                if (value !== undefined && value !== null && String(value).trim() !== '') return value;
+            }
+            return '';
+        }
+        function matchDateKey(value) {
+            const d = parseMatchDate(value);
+            if (!d) return '';
+            const parts = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Baghdad', year:'numeric', month:'2-digit', day:'2-digit'}).formatToParts(d);
+            const part = key => parts.find(x => x.type === key)?.value || '';
+            return `${part('year')}${part('month')}${part('day')}`;
+        }
+        async function fetchMatchOverrides(force=false) {
+            if (!force && cachedMatchOverrides.length && Date.now() - matchOverridesLoadedAt < 60000) return cachedMatchOverrides;
+            if (matchOverridesLoading) return matchOverridesLoading;
+            matchOverridesLoading = (async () => {
+                const {url, publishableKey} = MATCH_OVERRIDES_CONFIG;
+                const headers = {'apikey':publishableKey, 'Authorization':`Bearer ${publishableKey}`, 'Accept':'application/json'};
+                const tableNames = ['match_overrides','match_broadcasts','broadcast_channels','channel_streams'];
+                const loaded = {};
+                await Promise.all(tableNames.map(async table => {
+                    try {
+                        const response = await fetch(`${url}/rest/v1/${table}?select=*`, {cache:'no-store', headers});
+                        loaded[table] = response.ok ? await response.json() : [];
+                        if (!Array.isArray(loaded[table])) loaded[table] = [];
+                    } catch (_) { loaded[table] = []; }
+                }));
+                const channelRows = [...(loaded.broadcast_channels || []), ...(loaded.channel_streams || [])];
+                const getId = row => String(firstMatchField(row, ['channel_id','broadcast_channel_id','channelId','broadcastChannelId','id','channel_uuid']) || '');
+                const enriched = (loaded.match_broadcasts || []).map(row => {
+                    const refId = String(firstMatchField(row, ['channel_id','broadcast_channel_id','channelId','broadcastChannelId','broadcast_id']) || '');
+                    const linked = channelRows.filter(c => refId && [getId(c), String(c.broadcast_channel_id || ''), String(c.channel_id || '')].includes(refId));
+                    const channelInfo = linked.find(c => firstMatchField(c, ['name','channel','channel_name','title','label'])) || linked[0] || {};
+                    const streamInfo = linked.find(c => firstMatchField(c, ['stream_url','streamUrl','url','hd_url','sd_url','m3u8'])) || channelInfo;
+                    return {...channelInfo, ...row,
+                        channel: firstMatchField(row, ['channel','channel_name','broadcast_channel','broadcast','tv_channel','channel_title','station']) || firstMatchField(channelInfo, ['name','channel','channel_name','title','label']),
+                        stream_url: firstMatchField(row, ['stream_url','streamUrl','url','stream','m3u8']) || firstMatchField(streamInfo, ['stream_url','streamUrl','url','stream','m3u8','hd_url','sd_url'])};
+                });
+                cachedMatchOverrides = [...(loaded.match_overrides || []), ...enriched];
+                matchOverridesLoadedAt = Date.now();
+                return cachedMatchOverrides;
+            })().finally(() => { matchOverridesLoading = null; });
+            return matchOverridesLoading;
+        }
+        function applyMatchOverrides(matches, rows) {
+            if (!Array.isArray(rows) || !rows.length) return matches;
+            const homeFields = ['home','home_team','homeTeam','home_name','homeName','team_home','home_team_name','homeTeamName','team1','team_1','participant_home','home_team_ar','home_name_ar'];
+            const awayFields = ['away','away_team','awayTeam','away_name','awayName','team_away','away_team_name','awayTeamName','team2','team_2','participant_away','away_team_ar','away_name_ar'];
+            const channelFields = ['channel','channel_name','broadcast_channel','broadcast','tv_channel','channel_title','station','network','channelName','name'];
+            const commentatorFields = ['commentator','commentator_name','commentary_name','commentary','voice','commentatorName','commentator_ar','commentator_name_ar','speaker','default_commentator','commentator_default','announcer'];
+            const streamFields = ['stream_url','streamUrl','stream','url','m3u8','hd_url','sd_url','low_url'];
+            const idFields = ['match_id','matchId','fixture_id','fixtureId','event_id','eventId','external_match_id','tifo_id','match_uid'];
+            return matches.map(match => {
+                const rawHome = objName(pickValue(match.raw?.home, match.raw?.homeTeam, match.raw?.home_team, match.raw?.team_home, match.raw?.teams?.home, match.raw?.participants?.[0]));
+                const rawAway = objName(pickValue(match.raw?.away, match.raw?.awayTeam, match.raw?.away_team, match.raw?.team_away, match.raw?.teams?.away, match.raw?.participants?.[1]));
+                const names = [{home:normalizeMatchKeyPart(rawHome || match.home), away:normalizeMatchKeyPart(rawAway || match.away)}, {home:normalizeMatchKeyPart(match.home), away:normalizeMatchKeyPart(match.away)}];
+                const matchDate = match.parsedKickoff ? matchDateKey(match.parsedKickoff) : '';
+                const matchIds = [match.id, match.raw?.id, match.raw?.match_id, match.raw?.matchId, match.raw?.fixture_id, match.raw?.fixtureId, match.raw?.event_id, match.raw?.eventId].filter(v => v !== undefined && v !== null && String(v).trim()).map(String);
+                const candidates = rows.map(row => {
+                    const rowIds = idFields.map(k => row?.[k]).filter(v => v !== undefined && v !== null && String(v).trim()).map(String);
+                    const idMatch = rowIds.some(id => matchIds.includes(id));
+                    const keyParts = String(row.match_key || '').split('|');
+                    const rowHome = normalizeMatchKeyPart(firstMatchField(row, homeFields) || (keyParts.length >= 3 ? keyParts[1] : ''));
+                    const rowAway = normalizeMatchKeyPart(firstMatchField(row, awayFields) || (keyParts.length >= 3 ? keyParts[2] : ''));
+                    const teamMatch = names.some(n => n.home && n.away && n.home === rowHome && n.away === rowAway);
+                    if (!idMatch && !teamMatch) return null;
+                    const rawDate = firstMatchField(row, ['match_date','matchDate','date','utcDate','utc_date','kickoff','start_time','startTime','dateTime','scheduled_at','match_time']) || keyParts[0] || '';
+                    const rowDate = matchDateKey(rawDate) || String(rawDate).slice(0,10).replace(/[^0-9]/g,'');
+                    const cleanRowDate = String(rowDate).replace(/[^0-9]/g,'');
+                    if (!idMatch && cleanRowDate && matchDate && cleanRowDate !== matchDate && !cleanRowDate.endsWith(matchDate) && !matchDate.endsWith(cleanRowDate)) return null;
+                    return {...row, __idMatch:idMatch, __dateMatch:!!(cleanRowDate && matchDate && cleanRowDate === matchDate)};
+                }).filter(Boolean);
+                if (!candidates.length) return match;
+                candidates.sort((a,b) => Number(b.__idMatch)-Number(a.__idMatch) || Number(b.__dateMatch)-Number(a.__dateMatch));
+                const row = candidates[0];
+                const nestedBroadcast = row.channel_info || row.broadcast_channels || row.broadcast_channel || row.channel_data || {};
+                const nestedCommentary = row.commentary_info || row.commentator_info || row.commentary_data || {};
+                const channel = objName(pickValue(firstMatchField(row, channelFields), firstMatchField(nestedBroadcast, ['name','channel','channel_name','title','label'])));
+                const commentator = objName(pickValue(firstMatchField(row, commentatorFields), firstMatchField(nestedCommentary, ['commentator','commentator_name','name','voice','person'])));
+                const streamUrl = firstMatchField(row, streamFields);
+                const kickoffOverride = firstMatchField(row, ['kickoff','start_time','startTime','utc_date','utcDate','scheduled_at','match_time']);
+                const parsedOverride = kickoffOverride ? parseMatchDate(kickoffOverride) : null;
+                const correctedTime = parsedOverride ? parsedOverride.toLocaleTimeString('ar-IQ', {timeZone:'Asia/Baghdad', hour:'2-digit', minute:'2-digit', hour12:true}) : match.time;
+                return {...match, channel:channel || match.channel, commentator:commentator || match.commentator, streamUrl:streamUrl || match.streamUrl, time:correctedTime || match.time};
+            });
+        }
+
+
+        async function loadTodayMatches(force=false) {
+            const statusEl = document.getElementById('matchesStatus');
+            if (!statusEl || tifoLoading) return;
+            if (!force && cachedTodayMatches.length && Date.now() - tifoLastLoad < 60000) {
+                renderTodayMatches(); return;
+            }
+            tifoLoading = true;
+            statusEl.textContent = 'جارٍ تحميل مباريات اليوم...';
+            try {
+                let payload = null;
+                let all = [];
+                // Primary source: the GitHub Actions-generated JSON in the user's repository.
+                // A cache-busting query and no-store make the app pick up the latest scheduled update.
+                try {
+                    const response = await fetch(`${GITHUB_MATCHES_URL}?t=${Date.now()}`, {cache:'no-store'});
+                    if (!response.ok) throw new Error('GitHub matches.json HTTP ' + response.status);
+                    const candidate = await response.json();
+                    const rows = Array.isArray(candidate) ? candidate : (candidate.matches || candidate.fixtures || candidate.data || []);
+                    if (!Array.isArray(rows) || !rows.length) throw new Error('GitHub matches.json has no match rows');
+                    payload = candidate;
+                    all = rows.map(m => ({
+                        ...m,
+                        home: {name: m.team1 || m.home || '', logo: m.team1_img || m.homeLogo || ''},
+                        away: {name: m.team2 || m.away || '', logo: m.team2_img || m.awayLogo || ''},
+                        time: m.time || m.kickoff || '',
+                        score: {display: m.score || ''},
+                        status: m.status || 'upcoming',
+                        channel: m.channel || '',
+                        commentator: m.commentator || '',
+                        streamUrl: m.streamUrl || m.stream_url || ''
+                    }));
+                    currentMatchSource = 'GitHub Actions';
+                } catch (githubError) {
+                    console.warn('GitHub matches.json unavailable; trying existing Tifo fallback.', githubError);
+                    const dateKey = tifoUaeDateKey();
+                    const response = await fetch(`${TIFO_BASE}/day/${dateKey}.json`, {cache:'no-store'});
+                    if (!response.ok) throw new Error('GitHub and Tifo match feeds unavailable; Tifo HTTP ' + response.status);
+                    payload = await response.json();
+                    all = Array.isArray(payload) ? payload : (payload.matches || payload.fixtures || payload.data || payload.events || []);
+                    currentMatchSource = 'Tifo (احتياطي)';
+                }
+                let normalized = all.map(normalizeTifoMatch).filter(m => m.home && m.away);
+                try {
+                    const overrides = await fetchMatchOverrides(force);
+                    normalized = applyMatchOverrides(normalized, overrides);
+                } catch (overrideError) {
+                    console.warn('Match broadcast details unavailable; showing fixture data.', overrideError);
+                }
+                cachedTodayMatches = normalized.sort((a,b) => {
+                    if (a.status === 'live' && b.status !== 'live') return -1;
+                    if (b.status === 'live' && a.status !== 'live') return 1;
+                    return (a.parsedKickoff?.getTime() || 0) - (b.parsedKickoff?.getTime() || 0);
+                });
+                tifoLastLoad = Date.now();
+                statusEl.textContent = ''; // Hide the source/count status message from the match page.
+                renderTodayMatches();
+            } catch (error) {
+                console.error('Sat Zone/Tifo matches load failed:', error);
+                statusEl.textContent = 'تعذر تحميل مباريات اليوم. تأكد من الاتصال بالإنترنت وحاول التحديث.';
+                if (!cachedTodayMatches.length) {
+                    document.getElementById('matchesList').innerHTML = '<div class="empty-matches">تعذر تحميل مباريات اليوم حالياً. حاول مرة ثانية بعد قليل.</div>';
+                }
+            } finally { tifoLoading = false; }
+        }
+        function renderTodayMatches() {
+            const list = document.getElementById('matchesList');
+            if (!list) return;
+            const matches = cachedTodayMatches.filter(m => currentMatchFilter === 'all' || m.status === currentMatchFilter);
+            if (!matches.length) {
+                list.innerHTML = '<div class="empty-matches">لا توجد مباريات ضمن هذا التصنيف حالياً.</div>';
+                return;
+            }
+            list.innerHTML = matches.map((m, index) => {
+                const statusText = m.status === 'live' ? '● مباشر' : m.status === 'ended' ? 'انتهت' : 'لم تبدأ';
+                const channel = escapeMatchText(m.channel || 'اضغط للبحث عن القناة');
+                const commentator = escapeMatchText(m.commentator || 'غير محدد');
+                return `<article class="match-card" role="button" tabindex="0" data-match-index="${cachedTodayMatches.indexOf(m)}" aria-label="فتح القناة الناقلة لمباراة ${escapeMatchText(m.home)} ضد ${escapeMatchText(m.away)}"><div class="match-card-top"><div class="match-league">${escapeMatchText(m.league)}</div><span class="match-state ${m.status==='live'?'live':''}">${statusText}</span></div><div class="match-teams"><div class="match-team">${m.homeLogo ? `<img class="team-logo" src="${escapeMatchText(m.homeLogo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<span class="team-logo" aria-hidden="true">⚽</span>'}<span class="match-team-name">${escapeMatchText(m.home)}</span></div><div class="match-score">${escapeMatchText(m.score)}</div><div class="match-team">${m.awayLogo ? `<img class="team-logo" src="${escapeMatchText(m.awayLogo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<span class="team-logo" aria-hidden="true">⚽</span>'}<span class="match-team-name">${escapeMatchText(m.away)}</span></div></div><div class="match-meta"><div class="match-meta-item">🕒 <b>${escapeMatchText(m.time || 'الوقت غير محدد')}</b></div><div class="match-meta-item">📺 <b>${channel}</b></div><div class="match-meta-item">🎙️ <b>${commentator}</b></div><div class="match-meta-item">⚽ <b>${statusText}</b></div></div><small class="match-hint">اضغط للمشاهدة مباشرة ↗</small></article>`;
+            }).join('');
+            list.querySelectorAll('.match-card').forEach(card => {
+                const open = () => {
+                    // Trigger the mainstream Adsterra SmartLink only on the first match-card interaction.
+                    // The ad opens separately so the normal match/player flow can continue in this page.
+                    triggerAdsterraOnFirstMatchClick();
+                    openMatchChannel(cachedTodayMatches[Number(card.dataset.matchIndex)]);
+                };
+                card.addEventListener('click', open);
+                card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+            });
+        }
+        const ADSTERRA_SMARTLINK_URL = 'https://asiafilm.org/4/2b0996c0744d42583122cf526dff0bf0';
+        let adsterraTriggeredThisPage = false;
+        function triggerAdsterraOnFirstMatchClick() {
+            if (adsterraTriggeredThisPage) return;
+            try {
+                if (sessionStorage.getItem('yallaKoraAdsterraShown') === '1') {
+                    adsterraTriggeredThisPage = true;
+                    return;
+                }
+            } catch (_) { /* sessionStorage may be unavailable in some WebViews */ }
+            // Set the guard before opening to prevent rapid repeated clicks from opening multiple tabs.
+            adsterraTriggeredThisPage = true;
+            try { sessionStorage.setItem('yallaKoraAdsterraShown', '1'); } catch (_) {}
+            try { openAdsterraOverlay(); }
+            catch (error) { console.warn('Adsterra SmartLink could not be opened:', error); }
+        }
+
+        let adsterraLoadTimer = null;
+        function openAdsterraOverlay() {
+            const overlay = document.getElementById('adsterraOverlay');
+            const frame = document.getElementById('adsterraFrame');
+            const fallback = document.getElementById('adsterraFallback');
+            if (!overlay || !frame) {
+                // Fallback if the overlay markup is unavailable in an older cached copy.
+                window.open(ADSTERRA_SMARTLINK_URL, '_blank');
+                return;
+            }
+            if (adsterraLoadTimer) clearTimeout(adsterraLoadTimer);
+            if (fallback) fallback.classList.remove('show');
+            overlay.classList.add('is-open');
+            overlay.setAttribute('aria-hidden', 'false');
+            try { history.pushState({ yallaAdsterraOverlay: true }, '', location.href); } catch (_) {}
+            frame.onload = () => {
+                if (adsterraLoadTimer) clearTimeout(adsterraLoadTimer);
+                adsterraLoadTimer = null;
+            };
+            frame.src = ADSTERRA_SMARTLINK_URL;
+            // If the ad page is blocked or never loads, don't leave the user stuck on a blank screen.
+            adsterraLoadTimer = setTimeout(() => {
+                if (!overlay.classList.contains('is-open')) return;
+                if (fallback) fallback.classList.add('show');
+                setTimeout(() => {
+                    if (overlay.classList.contains('is-open')) closeAdsterraOverlay();
+                }, 2500);
+            }, 12000);
+        }
+        function closeAdsterraOverlay() {
+            const overlay = document.getElementById('adsterraOverlay');
+            const frame = document.getElementById('adsterraFrame');
+            const fallback = document.getElementById('adsterraFallback');
+            if (!overlay || !overlay.classList.contains('is-open')) return;
+            if (adsterraLoadTimer) clearTimeout(adsterraLoadTimer);
+            adsterraLoadTimer = null;
+            overlay.classList.remove('is-open');
+            overlay.setAttribute('aria-hidden', 'true');
+            if (fallback) fallback.classList.remove('show');
+            if (frame) { frame.onload = null; frame.src = 'about:blank'; }
+        }
+        window.addEventListener('popstate', () => {
+            closeAdsterraOverlay();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeAdsterraOverlay();
+        });
+
+        function normalizeChannelName(value) {
+            return String(value || '').toLowerCase().replace(/[\s._-]+/g,'').replace(/sports?/g,'').replace(/hd|4k|arabic|عربي|قناة/g,'').replace(/[^a-z0-9\u0600-\u06ff]/g,'');
+        }
+        async function getFirebaseChannels() {
+            if (tifoChannelCache.list && Date.now() - tifoChannelCache.loadedAt < 60000) return tifoChannelCache.list;
+            const snapshot = await db.ref('channels').once('value');
+            const list = [];
+            snapshot.forEach(child => {
+                const data = child.val();
+                if (data && (data.name || data.channel_name || data.channelName || data.title)) list.push({...data, name: data.name || data.channel_name || data.channelName || data.title, id:child.key});
+            });
+            tifoChannelCache.list = list;
+            tifoChannelCache.loadedAt = Date.now();
+            return list;
+        }
+        async function openMatchChannel(match) {
+            if (!match) return;
+            // A direct stream saved on the match has highest priority.
+            if (match.streamUrl && /^https?:\/\//i.test(match.streamUrl)) {
+                await playChannel({url:match.streamUrl});
+                return;
+            }
+            const wanted = normalizeChannelName(match.channel || match.raw?.channel_name || match.raw?.channelName || match.raw?.broadcast_channel || match.raw?.broadcastChannel || match.raw?.tv_channel || match.raw?.broadcaster);
+            try {
+                const channels = await getFirebaseChannels();
+                const usable = channels.filter(c => c && (c.name || c.channel_name || c.channelName || c.title) && (c.url || c.stream_url || c.streamUrl || c.stream || c.m3u8 || c.hd_url || c.hdUrl || c.sd_url || c.sdUrl || c.low_url || c.lowUrl || c.backup1_url || c.backup1Url || c.backup2_url || c.backup2Url));
+                const getChannelName = c => String(c.name || c.channel_name || c.channelName || c.title || '');
+                let selected = wanted ? usable.find(c => normalizeChannelName(getChannelName(c)) === wanted) : null;
+                if (!selected && wanted) selected = usable.find(c => {
+                    const n = normalizeChannelName(getChannelName(c));
+                    return n && (n.includes(wanted) || wanted.includes(n));
+                });
+                // Match numbered beIN channels by their channel number when the feed uses a slightly different label.
+                if (!selected && wanted) {
+                    const wantedNumber = wanted.match(/(?:bein|بين).*?(\d{1,2})/i)?.[1] || wanted.match(/(\d{1,2})$/)?.[1];
+                    if (wantedNumber) selected = usable.find(c => {
+                        const name = normalizeChannelName(getChannelName(c));
+                        const number = name.match(/(?:bein|بين).*?(\d{1,2})/i)?.[1] || name.match(/(\d{1,2})$/)?.[1];
+                        return number === wantedNumber && /bein|بين/.test(name);
+                    });
+                }
+                // Never silently open an unrelated/first channel when the match broadcaster is unknown.
+                if (!selected) {
+                    await openChannelPicker(match, usable);
+                    return;
+                }
+                await playChannel({url:selected.url || selected.stream_url || selected.streamUrl || selected.m3u8 || '', hd:selected.hd_url || selected.hdUrl || '', sd:selected.sd_url || selected.sdUrl || '', low:selected.low_url || selected.lowUrl || '', backup1:selected.backup1_url || selected.backup1Url || '', backup2:selected.backup2_url || selected.backup2Url || ''});
+            } catch (error) {
+                console.error('Could not resolve match channel:', error);
+                alert('تعذر الوصول إلى قائمة القنوات. تحقق من اتصال قاعدة البيانات ثم حاول مرة ثانية.');
+            }
+        }
+
+        async function openChannelPicker(match, knownChannels) {
+            try {
+                const channels = (knownChannels && knownChannels.length) ? knownChannels : await getFirebaseChannels();
+                const usable = channels.filter(c => c && (c.name || c.channel_name || c.channelName || c.title) && (c.url || c.stream_url || c.streamUrl || c.stream || c.m3u8 || c.hd_url || c.hdUrl || c.sd_url || c.sdUrl || c.low_url || c.lowUrl || c.backup1_url || c.backup1Url || c.backup2_url || c.backup2Url));
+                if (!usable.length) {
+                    alert('ما لكيت قنوات قابلة للتشغيل بقاعدة البيانات. تأكد أن القنوات تحتوي روابط بث ضمن الحقول url أو hd_url أو sd_url.');
+                    showPage('channelsPage');
+                    return;
+                }
+                const overlay = document.createElement('div');
+                overlay.className = 'channel-pick-overlay';
+                overlay.innerHTML = `<div class="channel-pick-box" role="dialog" aria-modal="true"><h3>اختيار القناة الناقلة</h3><p>ما توفّر اسم قناة مؤكد لمباراة <b>${escapeMatchText(match.home)} × ${escapeMatchText(match.away)}</b>. اختر القناة الموجودة بالتطبيق:</p><div class="channel-pick-list">${usable.map((c,i)=>`<button class="channel-pick-item" data-channel-index="${i}"><span>📺 ${escapeMatchText(c.name || c.channel_name || c.channelName || c.title)}</span><span>مشاهدة ←</span></button>`).join('')}</div><button class="channel-pick-close">إلغاء</button></div>`;
+                document.body.appendChild(overlay);
+                overlay.querySelector('.channel-pick-close').onclick = () => overlay.remove();
+                overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+                overlay.querySelectorAll('[data-channel-index]').forEach(btn => btn.addEventListener('click', async () => {
+                    const c = usable[Number(btn.dataset.channelIndex)];
+                    overlay.remove();
+                    showPage('channelsPage');
+                    await playChannel({url:c.url || c.stream_url || c.streamUrl || c.m3u8 || '', hd:c.hd_url || c.hdUrl || '', sd:c.sd_url || c.sdUrl || '', low:c.low_url || c.lowUrl || '', backup1:c.backup1_url || c.backup1Url || '', backup2:c.backup2_url || c.backup2Url || ''});
+                }));
+            } catch (error) {
+                console.error('Channel picker failed:', error);
+                alert('تعذر تحميل قنوات التطبيق من قاعدة البيانات.');
+            }
+        }
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyASo8wCgN6vDvjojcU40DXKJEfnW42uKFY",
+            authDomain: "yalla-kora-9ec86.firebaseapp.com",
+            databaseURL: "https://yalla-kora-9ec86-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "yalla-kora-9ec86",
+            storageBucket: "yalla-kora-9ec86.firebasestorage.app",
+            messagingSenderId: "436550928755",
+            appId: "1:436550928755:web:ebcebb517b87a2b021dd06"
+        };
+
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase initialized successfully');
+        } catch (err) {
+            console.error('Firebase initialization error:', err);
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            if (categoriesGrid) {
+                categoriesGrid.innerHTML = '<p style="color: #ff4444;">خطأ في الاتصال بـ Firebase. تحقق من إعدادات firebaseConfig.</p>';
+            }
+        }
+
+        const db = firebase.database();
+        const categoriesRef = db.ref('categories');
+        let player, hls, dashPlayer, shakaPlayer, currentServer = 'url', currentChannelServers = {};
+        const serverOrder = ['url', 'hd', 'sd', 'low', 'backup1', 'backup2'];
+        let serverControlsTimeout, playerControlsTimeout, fallbackTimeout;
+        let usingExternalEmbed = false;
+
+        // Load app
+        window.addEventListener('load', () => {
+            initializePlayer();
+            loadCategories();
+            const playerContainer = document.getElementById('playerContainer');
+            const channelsSection = document.getElementById('channelsSection');
+            if (playerContainer) playerContainer.style.display = 'none';
+            if (channelsSection) channelsSection.style.display = 'none';
+        });
+
+        // Initialize player
+        function initializePlayer() {
+            try {
+                const videoElement = document.getElementById('player');
+                if (!videoElement) {
+                    throw new Error('Video element not found');
+                }
+
+                if (typeof Plyr === 'undefined') {
+                    throw new Error('Plyr library not loaded');
+                }
+
+                player = new Plyr(videoElement, {
+                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                    autoplay: true,
+                    playsinline: true,
+                    hideControls: true,
+                    resetOnEnd: true,
+                    clickToPlay: false
+                });
+
+                player.on('error', (event) => {
+                    // Ignore errors from the hidden native video element while M3U8Online is active.
+                    const externalFrame = document.getElementById('m3u8OnlineFrame');
+                    if (usingExternalEmbed || (externalFrame && externalFrame.style.display === 'block')) {
+                        hideError();
+                        return;
+                    }
+                    console.error('Player error:', event.detail);
+                    showError('خطأ في تشغيل الفيديو. جارٍ المحاولة مع سيرفر آخر...');
+                    tryNextServer();
+                });
+
+                player.on('ready', () => {
+                    console.log('Player ready');
+                    hideSpinner();
+                    videoElement.style.display = 'block';
+                    showServerControls();
+                    showPlayerControls();
+                    player.play().catch(err => console.error('Play error:', err));
+                });
+
+                player.on('canplay', () => {
+                    console.log('Video can play');
+                    clearTimeout(fallbackTimeout);
+                    hideSpinner();
+                    showServerControls();
+                    showPlayerControls();
+                });
+
+                const clearPlaybackFallback = () => {
+                    clearTimeout(fallbackTimeout);
+                    hideSpinner();
+                };
+                videoElement.addEventListener('playing', clearPlaybackFallback);
+                videoElement.addEventListener('canplay', clearPlaybackFallback);
+
+                // Handle fullscreen events
+                player.on('enterfullscreen', () => {
+                    console.log('Entered fullscreen');
+                    showServerControls();
+                    showPlayerControls();
+                });
+
+                player.on('exitfullscreen', () => {
+                    console.log('Exited fullscreen');
+                    showServerControls();
+                    showPlayerControls();
+                });
+
+                // Initialize back button
+                const playerBackBtn = document.getElementById('playerBackBtn');
+                if (playerBackBtn) {
+                    playerBackBtn.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        console.log('Back button clicked');
+                        handlePlayerBack();
+                    });
+                }
+
+                // Add click event on video to show controls
+                videoElement.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const target = event.target;
+                    if (target.id === 'player' && !target.closest('.plyr__controls') && !target.closest('.server-selection') && !target.closest('.player-back-btn')) {
+                        console.log('Video clicked, showing controls');
+                        showPlayerControls();
+                        showServerControls();
+                    }
+                });
+
+                // Add mouse move event to show controls
+                videoElement.addEventListener('mousemove', () => {
+                    showPlayerControls();
+                    showServerControls();
+                });
+
+                console.log('Player initialized successfully');
+            } catch (err) {
+                console.error('Error initializing Plyr:', err);
+                showError('خطأ في تهيئة المشغل. تحقق من اتصالك.');
+            }
+        }
+
+        // Show Plyr controls
+        function showPlayerControls() {
+            const controls = document.querySelector('.plyr__controls');
+            if (controls) {
+                controls.style.opacity = '1';
+                controls.style.visibility = 'visible';
+                clearTimeout(playerControlsTimeout);
+                playerControlsTimeout = setTimeout(hidePlayerControls, 3000);
+                console.log('Plyr controls shown');
+            }
+        }
+
+        // Hide Plyr controls
+        function hidePlayerControls() {
+            const controls = document.querySelector('.plyr__controls');
+            if (controls) {
+                controls.style.opacity = '0';
+                controls.style.visibility = 'hidden';
+                console.log('Plyr controls hidden');
+            }
+        }
+
+        // Show server controls
+        function showServerControls() {
+            const serverSelection = document.getElementById('serverSelection');
+            if (serverSelection) {
+                serverSelection.classList.add('visible');
+                clearTimeout(serverControlsTimeout);
+                serverControlsTimeout = setTimeout(hideServerControls, 3000);
+                console.log('Server controls shown');
+            }
+        }
+
+        // Hide server controls
+        function hideServerControls() {
+            const serverSelection = document.getElementById('serverSelection');
+            if (serverSelection) {
+                serverSelection.classList.remove('visible');
+                console.log('Server controls hidden');
+            }
+        }
+
+        // Show/hide spinner and error
+        function showSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            const error = document.getElementById('videoError');
+            if (spinner) spinner.style.display = 'block';
+            if (error) error.style.display = 'none';
+        }
+
+        function hideSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.style.display = 'none';
+        }
+
+        function hideError() {
+            const error = document.getElementById('videoError');
+            if (error) {
+                error.textContent = '';
+                error.style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            const error = document.getElementById('videoError');
+            if (error) {
+                error.textContent = message;
+                error.style.display = 'block';
+                hideSpinner();
+                hideServerControls();
+            }
+        }
+
+        // Handle orientation change
+        function handleOrientationChange() {
+            const videoElement = document.getElementById('player');
+            const controls = document.querySelector('.plyr__controls');
+            const serverSelection = document.querySelector('.server-selection');
+            const playerContainer = document.getElementById('playerContainer');
+
+            if (videoElement && playerContainer && playerContainer.style.display === 'block') {
+                videoElement.style.width = '100%';
+                videoElement.style.height = '100%';
+                videoElement.style.maxWidth = '100vw';
+                videoElement.style.maxHeight = '100vh';
+                videoElement.style.objectFit = 'fill';
+                videoElement.style.objectPosition = 'center';
+                videoElement.style.margin = '0 auto';
+            }
+
+            if (controls) {
+                controls.style.width = '100%';
+                controls.style.maxWidth = '100vw';
+                controls.style.transform = 'none';
+            }
+
+            if (serverSelection) {
+                serverSelection.style.maxWidth = '90vw';
+                serverSelection.style.transform = 'translateX(-50%)';
+            }
+
+            console.log('Orientation changed, player components adjusted');
+            showPlayerControls();
+            showServerControls();
+        }
+
+        window.addEventListener('orientationchange', handleOrientationChange);
+        window.addEventListener('resize', handleOrientationChange);
+
+        // Load categories
+        async function loadCategories() {
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            if (!categoriesGrid) {
+                console.error('Categories grid element not found');
+                return;
+            }
+
+            categoriesGrid.innerHTML = '<p>جارٍ التحميل...</p>';
+
+            try {
+                console.log('Attempting to fetch categories from Firebase');
+                const snapshot = await categoriesRef.once('value');
+                if (!snapshot.exists()) {
+                    console.warn('No categories found in Firebase database');
+                    categoriesGrid.innerHTML = '<p style="color: #ff4444;">لا توجد أقسام متاحة. تحقق من وجود بيانات في المسار categories.</p>';
+                    return;
+                }
+
+                const categoriesData = snapshot.val();
+                console.log('Categories data:', categoriesData);
+                categoriesGrid.innerHTML = '';
+                let hasValidCategories = false;
+                Object.keys(categoriesData).forEach(key => {
+                    const data = categoriesData[key];
+                    if (data && data.name && data.image) {
+                        console.log(`Processing category: ${data.name}`);
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.className = 'category';
+                        categoryDiv.innerHTML = `
+                            <img src="${data.image}" alt="${data.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/150';">
+                            <span>${data.name}</span>
+                        `;
+                        categoryDiv.onclick = () => loadChannels(key, data.name);
+                        categoriesGrid.appendChild(categoryDiv);
+                        hasValidCategories = true;
+                    } else {
+                        console.warn(`Skipping invalid category data for key ${key}:`, data);
+                    }
+                });
+
+                if (!hasValidCategories) {
+                    categoriesGrid.innerHTML = '<p style="color: #ff4444;">لا توجد أقسام صالحة. تحقق من تنسيق البيانات (name وimage مطلوبان).</p>';
+                } else {
+                    console.log('Categories loaded successfully');
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                categoriesGrid.innerHTML = `<p style="color: #ff4444;">خطأ في تحميل الأقسام: ${error.message}. تحقق من الاتصال أو قواعد Firebase.</p>`;
+            }
+        }
+
+        // Load channels
+        async function loadChannels(categoryId, categoryName) {
+            const channelsSection = document.getElementById('channelsSection');
+            const channelsList = document.getElementById('channelsList');
+            const categoryTitle = document.getElementById('categoryTitle');
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            const searchBox = document.getElementById('searchBox');
+
+            if (!channelsSection || !channelsList || !categoryTitle || !categoriesGrid) {
+                console.error('Required elements for channels not found');
+                return;
+            }
+
+            categoryTitle.textContent = categoryName;
+            channelsList.innerHTML = '<p>جارٍ التحميل...</p>';
+            categoriesGrid.style.display = 'none';
+            channelsSection.style.display = 'block';
+            channelsSection.className = 'channels-section active';
+
+            try {
+                const snapshot = await db.ref('channels').once('value');
+                channelsList.innerHTML = '';
+
+                if (!snapshot.exists()) {
+                    console.warn('No channels found in Firebase database');
+                    channelsList.innerHTML = '<p style="color: #ff4444;">لا توجد قنوات متاحة.</p>';
+                    return;
+                }
+
+                const channels = [];
+                snapshot.forEach(child => {
+                    const data = child.val();
+                    if (data && data.category === categoryId) {
+                        data.id = child.key;
+                        channels.push(data);
+                    }
+                });
+
+                displayChannels(channels);
+
+                searchBox.value = '';
+                searchBox.oninput = () => {
+                    const searchText = searchBox.value.toLowerCase();
+                    const filteredChannels = channels.filter(c => c.name && c.name.toLowerCase().includes(searchText));
+                    displayChannels(filteredChannels);
+                };
+            } catch (error) {
+                console.error('Error loading channels:', error);
+                channelsList.innerHTML = `<p style="color: #ff4444;">خطأ في تحميل القنوات: ${error.message}</p>`;
+            }
+        }
+
+        // Display channels
+        function displayChannels(channels) {
+            const channelsList = document.getElementById('channelsList');
+            if (!channelsList) {
+                console.error('Channels list element not found');
+                return;
+            }
+
+            channelsList.innerHTML = '';
+
+            if (channels.length === 0) {
+                channelsList.innerHTML = '<p>لا توجد قنوات في هذا القسم.</p>';
+                return;
+            }
+
+            channels.forEach(data => {
+                if (!data.name || !data.logo) {
+                    console.warn('Skipping invalid channel data:', data);
+                    return;
+                }
+                const servers = {
+                    url: data.url || '',
+                    hd: data.hd_url || '',
+                    sd: data.sd_url || '',
+                    low: data.low_url || '',
+                    backup1: data.backup1_url || '',
+                    backup2: data.backup2_url || ''
+                };
+                console.log('Channel servers for', data.name, ':', servers);
+                const channelDiv = document.createElement('div');
+                channelDiv.className = 'channel';
+                channelDiv.innerHTML = `
+                    <img src="${data.logo}" alt="${data.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/50';">
+                    <span>${data.name}</span>
+                    <button class="watch-btn" data-servers='${JSON.stringify(servers).replace(/'/g, "\\'")}' onclick="handlePlayChannel(this)">مشاهدة</button>
+                `;
+                channelsList.appendChild(channelDiv);
+            });
+        }
+
+        // Handle play channel
+        function handlePlayChannel(button) {
+            try {
+                const servers = JSON.parse(button.getAttribute('data-servers').replace(/\\'/g, "'"));
+                console.log('Parsed servers:', servers);
+                playChannel(servers);
+            } catch (err) {
+                console.error('Error parsing servers:', err);
+                showError('خطأ في تحميل بيانات القناة.');
+            }
+        }
+
+        // Show categories
+        function showCategories() {
+            const channelsSection = document.getElementById('channelsSection');
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            if (channelsSection) channelsSection.style.display = 'none';
+            if (categoriesGrid) categoriesGrid.style.display = 'grid';
+            if (channelsSection) channelsSection.className = 'channels-section';
+        }
+
+        // Play channel
+        async function playChannel(servers) {
+            currentChannelServers = servers;
+            console.log('Playing channel with servers:', currentChannelServers);
+            currentServer = 'url';
+            const playerContainer = document.getElementById('playerContainer');
+            if (playerContainer) {
+                playerContainer.style.display = 'block';
+                document.body.classList.add('player-open');
+            }
+            hideError();
+            showSpinner();
+            showServerControls();
+            showPlayerControls();
+            createServerButtons();
+
+            try {
+                if (playerContainer && playerContainer.requestFullscreen) {
+                    await playerContainer.requestFullscreen();
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock('landscape').catch(err => {
+                            console.warn('Orientation lock failed:', err);
+                        });
+                    }
+                } else if (playerContainer && playerContainer.webkitRequestFullscreen) {
+                    await playerContainer.webkitRequestFullscreen();
+                }
+                console.log('Fullscreen requested');
+            } catch (err) {
+                console.error('Fullscreen error:', err);
+            }
+
+            await switchServer(currentServer);
+            if (!usingExternalEmbed) fallbackTimeout = setTimeout(tryNextServer, 18000);
+            handleOrientationChange();
+        }
+
+        // Create server buttons
+        function createServerButtons() {
+            const serverSelection = document.getElementById('serverSelection');
+            if (!serverSelection) {
+                console.error('Server selection element not found');
+                return;
+            }
+
+            serverSelection.innerHTML = '';
+            console.log('Creating server buttons for:', currentChannelServers);
+
+            const servers = [
+                { key: 'url', label: 'الأساسي' },
+                { key: 'hd', label: 'HD' },
+                { key: 'sd', label: 'SD' },
+                { key: 'low', label: 'Low' },
+                { key: 'backup1', label: 'الاحتياطي 1' },
+                { key: 'backup2', label: 'الاحتياطي 2' }
+            ];
+
+            let hasServers = false;
+            servers.forEach(server => {
+                const serverUrl = currentChannelServers[server.key];
+                console.log(`Processing server: ${server.label} (URL: ${serverUrl})`);
+                const button = document.createElement('button');
+                button.className = 'server-btn';
+                button.textContent = server.label;
+                button.onclick = (event) => {
+                    event.stopPropagation();
+                    console.log(`Server button clicked: ${server.key}`);
+                    switchServer(server.key);
+                    showServerControls();
+                    showPlayerControls();
+                };
+                if (server.key === currentServer) {
+                    button.classList.add('active');
+                }
+                if (!serverUrl || !isValidUrl(serverUrl)) {
+                    button.disabled = true;
+                    console.warn(`Server ${server.label} disabled due to invalid URL: ${serverUrl}`);
+                } else {
+                    hasServers = true;
+                }
+                serverSelection.appendChild(button);
+            });
+
+            if (!hasServers) {
+                serverSelection.innerHTML = '<p style="color: #000;">لا توجد سيرفرات متاحة</p>';
+                console.warn('No valid servers found for this channel');
+            }
+            showServerControls();
+        }
+
+        // Try next server
+        async function tryNextServer() {
+            const currentIndex = serverOrder.indexOf(currentServer);
+            const nextIndex = currentIndex + 1;
+
+            if (nextIndex < serverOrder.length) {
+                const nextServer = serverOrder[nextIndex];
+                if (currentChannelServers[nextServer] && isValidUrl(currentChannelServers[nextServer])) {
+                    console.log(`Switching to next server: ${nextServer}`);
+                    await switchServer(nextServer);
+                    fallbackTimeout = setTimeout(tryNextServer, 18000);
+                } else {
+                    tryNextServer();
+                }
+            } else {
+                showError('جميع السيرفرات غير متاحة. تحقق من اتصالك أو حاول لاحقًا.');
+                hideServerControls();
+                hidePlayerControls();
+            }
+        }
+
+        // Switch server
+        async function switchServer(serverKey) {
+            clearTimeout(fallbackTimeout);
+            currentServer = serverKey;
+            const url = currentChannelServers[serverKey];
+            if (!url || !isValidUrl(url)) {
+                console.warn('Invalid server URL:', url);
+                showError('رابط السيرفر غير صالح.');
+                tryNextServer();
+                return;
+            }
+
+            const buttons = document.querySelectorAll('.server-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (getServerLabel(serverKey) === btn.textContent) {
+                    btn.classList.add('active');
+                }
+            });
+
+            await cleanupPlayer();
+            hideError();
+            showSpinner();
+
+            // Pass the selected stream URL to M3U8Online's embed player.
+            // This embeds the player page; it does not proxy or convert the stream itself.
+            const videoElement = document.getElementById('player');
+            const externalFrame = document.getElementById('m3u8OnlineFrame');
+            usingExternalEmbed = true;
+            if (!externalFrame) {
+                usingExternalEmbed = false;
+                showError('مشغّل M3U8Online غير موجود في الصفحة.');
+                return;
+            }
+            if (videoElement) videoElement.style.display = 'none';
+            externalFrame.style.display = 'block';
+            externalFrame.onload = () => {
+                clearTimeout(fallbackTimeout);
+                hideSpinner();
+                hideError();
+                showServerControls();
+            };
+            externalFrame.onerror = () => {
+                hideSpinner();
+                showError('تعذر فتح مشغّل M3U8Online. تحقق من اتصال الإنترنت.');
+            };
+            externalFrame.src = 'https://m3u8online.com/embed/en#video_url=' + encodeURIComponent(url) + '&autoplay=true';
+            // The external player controls its own playback, so don't trigger direct-HLS fallback timers.
+            clearTimeout(fallbackTimeout);
+            return;
+
+            if (!videoElement) {
+                console.warn('Video element not found during server switch');
+                return;
+            }
+            videoElement.style.display = 'block';
+
+            try {
+                if (url.includes('.m3u8') && Hls.isSupported()) {
+                    if (hls) {
+                        hls.destroy();
+                        hls = null;
+                    }
+                    hls = new Hls({
+                        enableWorker: true,
+                        // Keep startup buffering modest so the first picture can appear sooner.
+                        lowLatencyMode: true,
+                        startFragPrefetch: true,
+                        maxBufferLength: 8,
+                        maxMaxBufferLength: 16,
+                        backBufferLength: 15,
+                        liveSyncDurationCount: 2,
+                        liveMaxLatencyDurationCount: 6,
+                        // Fail over sooner when the manifest/first segment is genuinely stuck.
+                        manifestLoadingTimeOut: 8000,
+                        fragLoadingTimeOut: 10000,
+                        manifestLoadingMaxRetry: 1,
+                        fragLoadingMaxRetry: 1
+                    });
+                    hls.loadSource(url);
+                    hls.attachMedia(videoElement);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        console.log('HLS manifest parsed');
+                        // Keep the loading indicator until the video can actually start.
+                        player.play().catch(err => console.warn('Autoplay was blocked or delayed:', err));
+                    });
+                    hls.on(Hls.Events.FRAG_BUFFERED, () => {
+                        clearTimeout(fallbackTimeout);
+                        hideSpinner();
+                    });
+                    hls.on(Hls.Events.ERROR, (event, data) => {
+                        console.error('HLS error:', data);
+                        // Recoverable HLS warnings are common during live streams; only fail over on fatal errors.
+                        if (data && data.fatal) {
+                            showError('تعذر تحميل البث من هذا السيرفر. جارٍ تجربة السيرفر التالي...');
+                            tryNextServer();
+                        }
+                    });
+                } else if (url.includes('.mpd') && dashjs.MediaPlayer().create().isSupported()) {
+                    if (dashPlayer) dashPlayer.reset();
+                    dashPlayer = dashjs.MediaPlayer().create();
+                    dashPlayer.initialize(videoElement, url, true);
+                    dashPlayer.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+                        hideSpinner();
+                        player.play().catch(err => console.error('Play error:', err));
+                    });
+                    dashPlayer.on(dashjs.MediaPlayer.events.ERROR, (event) => {
+                        console.error('DASH error:', event);
+                        showError('خطأ في تحميل الفيديو DASH.');
+                        tryNextServer();
+                    });
+                } else if (url.includes('.m3u8') && shaka.Player.isBrowserSupported()) {
+                    if (shakaPlayer) await shakaPlayer.destroy();
+                    shakaPlayer = new shaka.Player(videoElement);
+                    await shakaPlayer.load(url);
+                    hideSpinner();
+                    player.play().catch(err => console.error('Play error:', err));
+                    shakaPlayer.addEventListener('error', (event) => {
+                        console.error('Shaka error:', event);
+                        showError('خطأ في تحميل الفيديو Shaka.');
+                        tryNextServer();
+                    });
+                } else {
+                    videoElement.src = url;
+                    player.source = {
+                        type: 'video',
+                        sources: [{ src: url, type: guessMimeType(url) }]
+                    };
+                    videoElement.load();
+                    videoElement.addEventListener('canplay', () => {
+                        console.log('Video canplay event');
+                        hideSpinner();
+                        player.play().catch(err => console.error('Play error:', err));
+                    }, { once: true });
+                    videoElement.addEventListener('error', () => {
+                        console.error('Video element error');
+                        showError('خطأ في تحميل الفيديو.');
+                        tryNextServer();
+                    }, { once: true });
+                }
+            } catch (err) {
+                console.error('Error switching server:', err);
+                showError('خطأ في تحميل الفيديو.');
+                tryNextServer();
+            }
+        }
+
+        // Cleanup player
+        async function cleanupPlayer() {
+            try {
+                if (player) {
+                    player.stop();
+                    player.source = null;
+                }
+                if (hls) {
+                    hls.destroy();
+                    hls = null;
+                }
+                if (dashPlayer) {
+                    dashPlayer.reset();
+                    dashPlayer = null;
+                }
+                if (shakaPlayer) {
+                    await shakaPlayer.destroy();
+                    shakaPlayer = null;
+                }
+                const videoElement = document.getElementById('player');
+                const externalFrame = document.getElementById('m3u8OnlineFrame');
+                if (externalFrame) {
+                    externalFrame.onload = null;
+                    externalFrame.onerror = null;
+                    externalFrame.src = 'about:blank';
+                    externalFrame.style.display = 'none';
+                }
+                usingExternalEmbed = false;
+                if (videoElement) {
+                    videoElement.src = '';
+                    videoElement.load();
+                    videoElement.style.display = 'block';
+                }
+                hideServerControls();
+                hidePlayerControls();
+            } catch (err) {
+                console.error('Error cleaning up player:', err);
+            }
+        }
+
+        // Handle player back
+        function handlePlayerBack() {
+            console.log('Handling player back');
+            const playerContainer = document.getElementById('playerContainer');
+            const channelsSection = document.getElementById('channelsSection');
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const videoError = document.getElementById('videoError');
+
+            cleanupPlayer().then(() => {
+                if (playerContainer) {
+                    playerContainer.style.display = 'none';
+                }
+                document.body.classList.remove('player-open');
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
+                if (videoError) videoError.style.display = 'none';
+                if (categoriesGrid) categoriesGrid.style.display = 'grid';
+                showPage('channelsPage');
+                if (channelsSection) {
+                    channelsSection.style.display = 'none';
+                    channelsSection.className = 'channels-section';
+                }
+                if (document.fullscreenElement) {
+                    document.exitFullscreen().catch(err => console.warn('Exit fullscreen failed:', err));
+                }
+                if (screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock().catch(err => console.warn('Orientation unlock failed:', err));
+                }
+                hideServerControls();
+                hidePlayerControls();
+                console.log('Player closed, categories shown');
+            }).catch(err => {
+                console.error('Error during handlePlayerBack:', err);
+                showError('خطأ أثناء إغلاق المشغل.');
+            });
+        }
+
+        // Handle browser back
+        window.addEventListener('popstate', () => {
+            const playerContainer = document.getElementById('playerContainer');
+            const channelsSection = document.getElementById('channelsSection');
+            if (playerContainer && playerContainer.style.display === 'block') {
+                handlePlayerBack();
+            } else if (channelsSection && channelsSection.style.display === 'block') {
+                showCategories();
+            }
+        });
+
+        // Handle fullscreen change
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                console.log('Fullscreen entered via browser');
+                showServerControls();
+                showPlayerControls();
+            } else {
+                console.log('Fullscreen exited via browser');
+                showServerControls();
+                showPlayerControls();
+                if (screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock().catch(err => console.warn('Orientation unlock failed:', err));
+                }
+            }
+        });
+
+        // Validate URL
+        function isValidUrl(url) {
+            if (!url || typeof url !== 'string') return false;
+            try {
+                new URL(url);
+                return url.startsWith('http://') || url.startsWith('https://');
+            } catch {
+                return false;
+            }
+        }
+
+        // Get server label
+        function getServerLabel(key) {
+            const labels = {
+                url: 'الأساسي',
+                hd: 'HD',
+                sd: 'SD',
+                low: 'Low',
+                backup1: 'الاحتياطي 1',
+                backup2: 'الاحتياطي 2'
+            };
+            return labels[key] || key;
+        }
+
+        // Guess MIME type
+        function guessMimeType(url) {
+            if (url.includes('.mp4')) return 'video/mp4';
+            if (url.includes('.m3u8')) return 'application/x-mpegURL';
+            if (url.includes('.mpd')) return 'application/dash+xml';
+            return 'video/mp4';
+        }
+
+        // Start on the matches page and refresh from GitHub JSON periodically while the app is open.
+        loadTodayMatches(true);
+        window.setInterval(() => loadTodayMatches(true), 5 * 60 * 1000);
+    </script>
+
+    <script>
+    // Firebase Cloud Messaging web setup for Yalla Kora.
+    // Requires HTTPS hosting, firebase-messaging-sw.js at the site root, and a supported browser.
+    (function () {
+        const VAPID_PUBLIC_KEY = 'BGW9KSq23Lm5ONWS2cs2kH8VTByQXkBKrqLzaHxp3OH4AKTHadGD1cw53u1tXIN-541p_igL5iVSRsdJFS42AF0';
+        const enableBtn = document.getElementById('enableNotificationsBtn');
+        const statusEl = document.getElementById('notificationStatus');
+        const tokenWrap = document.getElementById('notificationTokenWrap');
+        const tokenEl = document.getElementById('notificationToken');
+        const copyBtn = document.getElementById('copyNotificationTokenBtn');
+        if (!enableBtn || !statusEl) return;
+
+        function setStatus(message) { statusEl.textContent = message; }
+        function setToken(token) {
+            tokenEl.value = token;
+            tokenWrap.hidden = false;
+        }
+
+        enableBtn.addEventListener('click', async function () {
+            enableBtn.disabled = true;
+            try {
+                if (!window.isSecureContext || !('serviceWorker' in navigator) || !('Notification' in window)) {
+                    throw new Error('الإشعارات تحتاج صفحة HTTPS ومتصفحًا يدعم Service Worker. قد لا تعمل داخل بعض تطبيقات WebView.');
+                }
+                if (!window.firebase || !firebase.messaging) {
+                    throw new Error('تعذّر تحميل مكتبة Firebase Messaging. تحقق من الاتصال بالإنترنت.');
+                }
+                const supported = await firebase.messaging.isSupported();
+                if (!supported) throw new Error('هذا المتصفح لا يدعم Firebase Web Messaging.');
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') throw new Error('لم يتم منح إذن الإشعارات. فعّل الإذن من إعدادات المتصفح.');
+
+                const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                await navigator.serviceWorker.ready;
+                const messaging = firebase.messaging();
+                const token = await messaging.getToken({ vapidKey: VAPID_PUBLIC_KEY, serviceWorkerRegistration: registration });
+                if (!token) throw new Error('لم يتم إنشاء رمز الجهاز. أعد المحاولة بعد التأكد من إعدادات Web Push.');
+                setToken(token);
+                setStatus('تم تفعيل إذن الإشعارات وإنشاء رمز الجهاز. لاختبار الإرسال، استخدم Firebase Console. الإرسال التلقائي للمباريات يحتاج خدمة إرسال آمنة.');
+
+                messaging.onMessage(function (payload) {
+                    const title = (payload.notification && payload.notification.title) || 'يلا كورة';
+                    const body = (payload.notification && payload.notification.body) || 'لديك إشعار جديد.';
+                    if (Notification.permission === 'granted') {
+                        try { new Notification(title, { body: body, icon: './icon-192.png' }); }
+                        catch (_) { setStatus(title + ': ' + body); }
+                    } else {
+                        setStatus(title + ': ' + body);
+                    }
+                });
+            } catch (error) {
+                console.error('FCM setup failed:', error);
+                setStatus(error && error.message ? error.message : 'تعذّر تفعيل الإشعارات.');
+            } finally {
+                enableBtn.disabled = false;
+            }
+        });
+
+        copyBtn.addEventListener('click', async function () {
+            try {
+                await navigator.clipboard.writeText(tokenEl.value);
+                copyBtn.textContent = 'تم النسخ ✓';
+                setTimeout(() => copyBtn.textContent = 'نسخ رمز الجهاز', 1800);
+            } catch (_) {
+                tokenEl.focus(); tokenEl.select();
+                setStatus('حدّد الرمز وانسخه يدويًا.');
+            }
+        });
+    })();
+    </script>
+
+    <div id="adsterraOverlay" aria-hidden="true" role="dialog" aria-label="إعلان">
+        <div id="adsterraTopbar">
+            <span>إعلان</span>
+            <button id="adsterraClose" type="button" aria-label="إغلاق الإعلان" onclick="closeAdsterraOverlay()">×</button>
+        </div>
+        <iframe id="adsterraFrame" title="إعلان" src="about:blank" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; clipboard-read; clipboard-write"></iframe>
+        <div id="adsterraFallback" role="status">تعذّر تحميل الإعلان. جارٍ إرجاعك إلى جدول المباريات…</div>
+    </div>
+
+</body>
+</html>
